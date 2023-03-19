@@ -35,8 +35,7 @@ public class User implements UserDetails {
     private Role role;
     private int experience;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinColumn(name = "restaurant_id")
+    @ManyToOne(cascade = {CascadeType.ALL})
     private Restaurant restaurant;
 
     public User(String firstName, String lastName, LocalDate dateOfBirth, String email, String password, String phoneNumber, Role role, int experience) {

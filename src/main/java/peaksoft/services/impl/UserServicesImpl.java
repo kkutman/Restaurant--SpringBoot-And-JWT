@@ -21,9 +21,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-/**
- * name : kutman
- **/
 @Service
 @RequiredArgsConstructor
 public class UserServicesImpl implements UserServices {
@@ -101,7 +98,6 @@ public class UserServicesImpl implements UserServices {
                 .token(jwtToken).build();
     }
 
-
     @Override
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
@@ -159,12 +155,11 @@ public class UserServicesImpl implements UserServices {
                 "admin",
                 LocalDate.now(),
                 "admin",
-                passwordEncoder.encode("admin"),
+                "admin",
                 "+996777666555",
                 Role.ADMIN,
                 2
         );
         saveUser(user);
-
     }
 }

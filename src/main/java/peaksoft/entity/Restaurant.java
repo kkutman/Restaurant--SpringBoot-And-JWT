@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import peaksoft.enums.RestaurantType;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -25,7 +27,7 @@ public class Restaurant {
     private int services;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<User> users = new LinkedHashSet<>();
+    private List<User> users = new ArrayList<>();
 
     public Restaurant(String name, String location, RestaurantType restaurantType, int numberOfEmployees, int services) {
         this.name = name;
@@ -36,5 +38,8 @@ public class Restaurant {
     }
 
     public Restaurant() {
+    }
+    public void assign(User user){
+        this.users.add(user);
     }
 }
