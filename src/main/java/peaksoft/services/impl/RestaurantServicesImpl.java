@@ -114,7 +114,7 @@ public class RestaurantServicesImpl implements RestaurantServices {
             restaurant1 = restaurant;
         }
         User user = userServices.findById(userId).orElseThrow(() ->
-                new NoSuchElementException(String.format("Author with id :%s already exists", userId)));
+                new NoSuchElementException(String.format("User with id :%s already exists", userId)));
         if (restaurant1 != null) {
             if (takeOrNot) {
                 user.setRestaurant(restaurant1);

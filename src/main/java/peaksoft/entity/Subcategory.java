@@ -19,10 +19,8 @@ public class Subcategory {
     @SequenceGenerator(name = "subcategory_seq")
     private Long id;
     private String name;
-
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     private Category category;
-
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     private MenuItem menuItem;
 
