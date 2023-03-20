@@ -74,4 +74,16 @@ public class CategoryServicesImpl implements CategoryServices {
         }
         return null;
     }
+
+    @Override
+    public Category get(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() ->
+                new NoSuchElementException(String.format
+                        ("There is no Category with this ID %s", id)));
+    }
+
+    @Override
+    public void saves(Category category) {
+        categoryRepository.save(category);
+    }
 }
