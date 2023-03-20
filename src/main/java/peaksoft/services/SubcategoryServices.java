@@ -16,6 +16,6 @@ public interface SubcategoryServices {
     String delete(Long id);
     List<SubcategoryResponse>getAll(Long id);
     SubcategoryResponse update(Long id,SubcategoryRequest request);
-    Map<CategoryResponse,SubcategoryResponse>getMap();
+    Map<String, List<SubcategoryResponse>> getMap();
 
 }

@@ -45,7 +45,7 @@ public class SubcategoryController {
     }
 
     @GetMapping("/map")
-    public Map<CategoryResponse,SubcategoryResponse>map(){
+    public Map<String, List<SubcategoryResponse>> map(){
         return subcategoryServices.getMap();
     }
 

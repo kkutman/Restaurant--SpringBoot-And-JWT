@@ -15,6 +15,8 @@ import peaksoft.services.SubcategoryServices;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -28,11 +30,10 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
         if (id != null) {
             if (!request.getName().isBlank()) {
                 Category category = categoryRepository.findById(id).orElseThrow();
-                Subcategory subcategory = new Subcategory();
-                subcategory.setName(request.getName());
+                Subcategory subcategory = new Subcategory(request.getName());
                 subcategory.setCategory(category);
                 subcategoryRepository.save(subcategory);
-                return new SubcategoryResponse(subcategory.getId(), subcategory.getName());
+                return new SubcategoryResponse(subcategory.getId(),subcategory.getName(),subcategory.getCategory().getName());
             }
         }
 
@@ -74,13 +75,16 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
                             ("There is no SubCategory with this ID %s", id)));
             subcategory.setName(request.getName());
             subcategoryRepository.save(subcategory);
-            return new SubcategoryResponse(subcategory.getId(), subcategory.getName());
+            return new SubcategoryResponse(subcategory.getId(), subcategory.getName(),subcategory.getName());
         }
         return null;
     }
 
     @Override
-    public Map<CategoryResponse, SubcategoryResponse> getMap() {
-        return subcategoryRepository.getMap();
+    public Map<String, List<SubcategoryResponse>>  getMap() {
+        Map<String, List<SubcategoryResponse>> subcategoryResponseMapCollector = subcategoryRepository.getAll().stream().collect(Collectors.groupingBy(SubcategoryResponse::getCategoryName));
+
+
+    return subcategoryResponseMapCollector;
     }
 }
