@@ -6,8 +6,10 @@ import peaksoft.dto.request.SubcategoryRequest;
 import peaksoft.dto.response.CategoryResponse;
 import peaksoft.dto.response.SubcategoryResponse;
 import peaksoft.entity.Category;
+import peaksoft.entity.MenuItem;
 import peaksoft.entity.Subcategory;
 import peaksoft.repository.CategoryRepository;
+import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.SubcategoryRepository;
 import peaksoft.services.CategoryServices;
 import peaksoft.services.SubcategoryServices;
@@ -24,16 +26,21 @@ import java.util.stream.Collectors;
 public class SubcategoryServicesImpl implements SubcategoryServices {
     private final SubcategoryRepository subcategoryRepository;
     private final CategoryRepository categoryRepository;
+    private final MenuItemRepository menuItemRepository;
 
     @Override
-    public SubcategoryResponse saveSubcategory(Long id, SubcategoryRequest request) {
+    public SubcategoryResponse saveSubcategory(Long id,Long menuId, SubcategoryRequest request) {
         if (id != null) {
-            if (!request.getName().isBlank()) {
-                Category category = categoryRepository.findById(id).orElseThrow();
-                Subcategory subcategory = new Subcategory(request.getName());
-                subcategory.setCategory(category);
-                subcategoryRepository.save(subcategory);
-                return new SubcategoryResponse(subcategory.getId(),subcategory.getName(),subcategory.getCategory().getName());
+            if (menuId != null) {
+                if (!request.getName().isBlank()) {
+                    Category category = categoryRepository.findById(id).orElseThrow();
+                    MenuItem menuItem = menuItemRepository.findById(menuId).orElseThrow();
+                    Subcategory subcategory = new Subcategory(request.getName());
+                    subcategory.setMenuItem(menuItem);
+                    subcategory.setCategory(category);
+                    subcategoryRepository.save(subcategory);
+                    return new SubcategoryResponse(subcategory.getId(), subcategory.getName(), subcategory.getCategory().getName());
+                }
             }
         }
 

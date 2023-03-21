@@ -11,7 +11,7 @@ import java.util.Map;
  * name : kutman
  **/
 public interface SubcategoryServices {
-    SubcategoryResponse saveSubcategory(Long id,SubcategoryRequest request);
+    SubcategoryResponse saveSubcategory(Long id,Long menuId,SubcategoryRequest request);
     SubcategoryResponse getById(Long id);
     String delete(Long id);
     List<SubcategoryResponse>getAll(Long id);

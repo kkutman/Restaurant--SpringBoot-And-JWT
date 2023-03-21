@@ -19,9 +19,9 @@ import java.util.Map;
 public class SubcategoryController {
     private final SubcategoryServices subcategoryServices;
 
-    @PostMapping("/save/{id}")
-    public SubcategoryResponse save(@PathVariable Long id, @RequestBody SubcategoryRequest request) {
-        return subcategoryServices.saveSubcategory(id,request);
+    @PostMapping("/save/{categoryId}/{menuId}")
+    public SubcategoryResponse save(@PathVariable Long categoryId,@PathVariable Long menuId, @RequestBody SubcategoryRequest request) {
+        return subcategoryServices.saveSubcategory(categoryId,menuId,request);
     }
 
     @GetMapping("/getAll/{id}")

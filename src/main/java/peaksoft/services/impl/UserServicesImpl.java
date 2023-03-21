@@ -148,18 +148,18 @@ public class UserServicesImpl implements UserServices {
         );
     }
 
-    @PostConstruct
-    public void init() {
-        UserRequest user = new UserRequest(
-                "admin",
-                "admin",
-                LocalDate.now(),
-                "admin",
-                "admin",
-                "+996777666555",
-                Role.ADMIN,
-                2
-        );
-        saveUser(user);
-    }
+//    @PostConstruct
+//    public void init() {
+//        UserRequest user = new UserRequest(
+//                "admin",
+//                "admin",
+//                LocalDate.now(),
+//                "admin",
+//                "admin",
+//                "+996777666555",
+//                Role.ADMIN,
+//                2
+//        );
+//        saveUser(user);
+//    }
 }

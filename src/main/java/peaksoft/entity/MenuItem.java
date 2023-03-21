@@ -1,7 +1,9 @@
 package peaksoft.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "menu_items")
+@NoArgsConstructor
+@AllArgsConstructor
 public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "menu_item_seq")
@@ -19,7 +23,6 @@ public class MenuItem {
     private Long id;
     private String name;
     private String image;
-    @Column(nullable = false)
     private int price;
     private String description;
     private Boolean isVegetarian;
@@ -28,7 +31,15 @@ public class MenuItem {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    private List<Subcategory>subcategories;
     @ManyToMany(mappedBy = "menuItems_id", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     private List<Cheque> cheques = new ArrayList<>();
-
+    public MenuItem(String name, String image, int price, String description, Boolean isVegetarian) {
+        this.name = name;
+        this.image = image;
+        this.price = price;
+        this.description = description;
+        this.isVegetarian = isVegetarian;
+    }
 }
