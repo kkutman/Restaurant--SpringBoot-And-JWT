@@ -20,18 +20,14 @@ public class StopListServicesImpl implements StopListServices {
     private final MenuItemRepository menuItemRepository;
 
     @Override
-    public StopListResponse save(Long menuId, StopListRequest request) {
+    public StopListResponse save(Long menuId, StopListRequest request) throws SaveStopListException {
         MenuItem menuItem = menuItemRepository.findById(menuId).orElseThrow(() ->
-                new NoSuchElementException(String.format("Stop List with id :%s already exists!", menuId)));
+                new NoSuchElementException(String.format("Menu Item with id :%s already exists!", menuId)));
         for (StopList stopList : stopListRepository.findAll()) {
-            if (stopList.getDate() == request.getDate()) {
-                if(stopList.getMenuItem()==menuItem) {
-                    try {
+            int date = stopList.getDate().compareTo(request.getDate());
+            if (date==0) {
+                if(stopList.getMenuItem().getId()==menuItem.getId()) {
                         throw new SaveStopListException("Save Date Exception!");
-                    } catch (SaveStopListException e) {
-                        return null;
-
-                    }
                 }
             }
         }
@@ -53,8 +49,8 @@ public class StopListServicesImpl implements StopListServices {
     public String delete(Long id) {
         StopList stopList = stopListRepository.findById(id).orElseThrow(() ->
                 new NoSuchElementException(String.format("StopList with id :%s already exists", id)));
-        stopListRepository.deleteById(id);
-        return stopList.getId() + " is deleted!!!";
+        stopListRepository.deleteStopList(id);
+        return id+ " is deleted!!!";
     }
 
     @Override
