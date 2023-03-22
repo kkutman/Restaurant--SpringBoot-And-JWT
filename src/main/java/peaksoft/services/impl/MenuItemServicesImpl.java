@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import peaksoft.dto.request.MenuItemRequest;
 import peaksoft.dto.response.MenuItemResponse;
 import peaksoft.entity.MenuItem;
+import peaksoft.entity.Restaurant;
 import peaksoft.entity.Subcategory;
 import peaksoft.repository.MenuItemRepository;
+import peaksoft.repository.RestaurantRepository;
 import peaksoft.repository.SubcategoryRepository;
 import peaksoft.services.MenuItemServices;
 
@@ -24,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 public class MenuItemServicesImpl implements MenuItemServices {
     private final MenuItemRepository menuItemRepository;
     private final SubcategoryRepository subcategoryRepository;
+    private final RestaurantRepository restaurantRepository;
     private Boolean ifNot(MenuItemRequest request){
         return request.getName().isBlank() && request.getImage().isBlank() && request.getPrice() == 0 && request.getDescription().isBlank();
     }
@@ -33,6 +36,10 @@ public class MenuItemServicesImpl implements MenuItemServices {
         if (request.getName().isBlank() && request.getImage().isBlank() && request.getPrice() == 0 && request.getDescription().isBlank()) {
             return null;
         } else {
+            Restaurant restaurant1 = null;
+            for (Restaurant restaurant : restaurantRepository.findAll()) {
+                restaurant1 = restaurant;
+            }
             MenuItem menuItem = new MenuItem(
                     request.getName(),
                     request.getImage(),
@@ -40,6 +47,7 @@ public class MenuItemServicesImpl implements MenuItemServices {
                     request.getDescription(),
                     request.getIsVegetarian()
             );
+            menuItem.setRestaurant(restaurant1);
             menuItemRepository.save(menuItem);
             return new MenuItemResponse(
                     menuItem.getId(),

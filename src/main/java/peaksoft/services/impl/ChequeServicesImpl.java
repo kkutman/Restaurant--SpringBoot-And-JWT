@@ -42,7 +42,6 @@ public class ChequeServicesImpl implements ChequeServices {
                         new NoSuchElementException(String.format("Author with email :%s already exists", request.getWaiterId())));
         Cheque cheque = new Cheque();
         List<MenuItemResponse> menuItemResponses = new ArrayList<>();
-        List<MenuItem> menuItemList = new ArrayList<>();
         for (String s : request.getMenuName()) {
             MenuItem byName = menuItemRepository.findByName(s);
             MenuItemResponse byNameResponse = menuItemRepository.findByNameResponse(s);

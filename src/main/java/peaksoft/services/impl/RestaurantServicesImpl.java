@@ -117,12 +117,16 @@ public class RestaurantServicesImpl implements RestaurantServices {
                 new NoSuchElementException(String.format("User with id :%s already exists", userId)));
         if (restaurant1 != null) {
             if (takeOrNot) {
-                user.setRestaurant(restaurant1);
-                restaurant1.assign(user);
-                restaurant1.setNumberOfEmployees(restaurant1.getNumberOfEmployees()+1);
-                userServices.save(user);
-                restaurantRepository.save(restaurant1);
-                return String.format("%s and %s assign!", restaurant1.getName(), user.getFirstName());
+                if(restaurant1.getNumberOfEmployees()<15) {
+                    user.setRestaurant(restaurant1);
+                    restaurant1.assign(user);
+                    restaurant1.setNumberOfEmployees(restaurant1.getNumberOfEmployees() + 1);
+                    userServices.save(user);
+                    restaurantRepository.save(restaurant1);
+                    return String.format("%s and %s assign!", restaurant1.getName(), user.getFirstName());
+                }else {
+                    return "no assign!";
+                }
             } else {
                 userServices.deleteById(user.getId());
                 return String.format("%s and %s dont assign!", restaurant1.getName(), user.getFirstName());
