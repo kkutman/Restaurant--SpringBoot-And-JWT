@@ -1,6 +1,7 @@
 package peaksoft.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 import peaksoft.dto.request.ChequeRequest;
 import peaksoft.dto.response.ChequeResponse;
@@ -28,5 +29,15 @@ public class ChequeController {
     @GetMapping("/getAll")
     public List<ChequeResponse>getAll(){
         return chequeServices.getAll();
+    }
+
+    @PutMapping("/update/{id}")
+    public ChequeResponse update(@PathVariable Long id,@RequestBody ChequeRequest request){
+        return chequeServices.update(id, request);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String delete(@PathVariable Long id){
+        return chequeServices.delete(id);
     }
 }

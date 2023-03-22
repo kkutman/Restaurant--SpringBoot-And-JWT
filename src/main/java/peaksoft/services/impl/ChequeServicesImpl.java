@@ -159,7 +159,6 @@ public class ChequeServicesImpl implements ChequeServices {
                         ));
                     }
                 }
-
             }
             chequeResponseList.add(new ChequeResponse(
                     cheque.getId(),
@@ -177,4 +176,43 @@ public class ChequeServicesImpl implements ChequeServices {
     public int totalPriceRestaurant() {
         return 0;
     }
+
+    @Override
+    public ChequeResponse getById(Long id) {
+        Restaurant restaurant1 = null;
+        for (Restaurant restaurant : restaurantRepository.findAll()) {
+            restaurant1 = restaurant;
+        }
+        Cheque cheque = chequeRepository.findById(id).orElseThrow();
+        List<MenuItemResponse>menuItemResponseList = new ArrayList<>();
+        for (MenuItem menuItem : cheque.getMenuItems_id()) {
+            menuItemResponseList.add(
+                    new MenuItemResponse(
+                            menuItem.getId(),
+                            menuItem.getName(),
+                            menuItem.getImage(),
+                            menuItem.getPrice(),
+                            menuItem.getDescription(),
+                            menuItem.getIsVegetarian()
+                    )
+            );
+        }
+        return new ChequeResponse(
+                cheque.getId(),
+                cheque.getUser().getFirstName().concat(" ").concat(cheque.getUser().getLastName()),
+                menuItemResponseList,
+                cheque.getTotal(),
+                restaurant1.getServices(),
+                cheque.getGrandTotal()
+        );
+    }
+
+
+    @Override
+    public String delete(Long id) {
+        chequeRepository.delete(id);
+        return id+" is deleted!";
+    }
+
+
 }

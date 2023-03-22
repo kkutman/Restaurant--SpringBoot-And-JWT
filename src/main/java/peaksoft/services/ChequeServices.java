@@ -14,4 +14,7 @@ public interface ChequeServices {
     ChequeResponse update(Long id,ChequeRequest request);
     List<ChequeResponse>getAll();
     int totalPriceRestaurant();
+
+    String delete(Long id);
+    ChequeResponse getById(Long id);
 }
