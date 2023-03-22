@@ -1,7 +1,9 @@
 package peaksoft.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -14,6 +16,8 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "cheques")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Cheque {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cheque_seq")
@@ -21,6 +25,8 @@ public class Cheque {
     private Long id;
     private int priceAverage;
     private LocalDate createdAt;
+    private int total;
+    private int grandTotal;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "user_id")
@@ -32,4 +38,11 @@ public class Cheque {
             inverseJoinColumns = @JoinColumn(name = "menu_items_"))
     private List<MenuItem> menuItems_id;
 
+    public Cheque(int priceAverage, LocalDate createdAt, int grandTotal, User user, List<MenuItem> menuItems_id) {
+        this.priceAverage = priceAverage;
+        this.createdAt = createdAt;
+        this.grandTotal = grandTotal;
+        this.user = user;
+        this.menuItems_id = menuItems_id;
+    }
 }

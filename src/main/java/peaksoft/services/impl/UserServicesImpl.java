@@ -148,8 +148,8 @@ public class UserServicesImpl implements UserServices {
         );
     }
 
-//    @PostConstruct
-//    public void init() {
+    @PostConstruct
+    public void init() {
 //        UserRequest user = new UserRequest(
 //                "admin",
 //                "admin",
@@ -161,5 +161,5 @@ public class UserServicesImpl implements UserServices {
 //                2
 //        );
 //        saveUser(user);
-//    }
+    }
 }
