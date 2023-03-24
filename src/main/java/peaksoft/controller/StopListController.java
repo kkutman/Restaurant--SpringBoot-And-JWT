@@ -48,7 +48,7 @@ public class StopListController {
     }
 
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','CHEF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CHEF' )")
     public StopListResponse update(@PathVariable Long id,@RequestBody StopListRequest request){
         return stopListServices.update(id, request);
     }

@@ -16,4 +16,5 @@ public class MenuItemRequest {
     private int price;
     private String description;
     private Boolean isVegetarian;
+    private Long subcategoryId;
 }

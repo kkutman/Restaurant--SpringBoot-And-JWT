@@ -12,22 +12,20 @@ import peaksoft.repository.RestaurantRepository;
 import peaksoft.repository.SubcategoryRepository;
 import peaksoft.services.MenuItemServices;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static java.util.stream.Collectors.toList;
-
-/**
- * name : kutman
- **/
 @Service
 @RequiredArgsConstructor
 public class MenuItemServicesImpl implements MenuItemServices {
     private final MenuItemRepository menuItemRepository;
     private final SubcategoryRepository subcategoryRepository;
     private final RestaurantRepository restaurantRepository;
-    private Boolean ifNot(MenuItemRequest request){
+
+    private Boolean ifNot(MenuItemRequest request) {
         return request.getName().isBlank() && request.getImage().isBlank() && request.getPrice() == 0 && request.getDescription().isBlank();
     }
 
@@ -40,6 +38,7 @@ public class MenuItemServicesImpl implements MenuItemServices {
             for (Restaurant restaurant : restaurantRepository.findAll()) {
                 restaurant1 = restaurant;
             }
+            Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId()).orElseThrow(() -> new NoSuchElementException("N Subcategory By Id " + request.getSubcategoryId()));
             MenuItem menuItem = new MenuItem(
                     request.getName(),
                     request.getImage(),
@@ -47,6 +46,7 @@ public class MenuItemServicesImpl implements MenuItemServices {
                     request.getDescription(),
                     request.getIsVegetarian()
             );
+            menuItem.setSubcategories(subcategory);
             menuItem.setRestaurant(restaurant1);
             menuItemRepository.save(menuItem);
             return new MenuItemResponse(
@@ -66,12 +66,14 @@ public class MenuItemServicesImpl implements MenuItemServices {
         if (ifNot(request)) {
             return null;
         } else {
+            Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId()).orElseThrow(() -> new NoSuchElementException("N Subcategory By Id " + request.getSubcategoryId()));
             MenuItem menuItem = menuItemRepository.findById(id).orElseThrow();
-            menuItem.setName(menuItem.getName());
-            menuItem.setImage(menuItem.getImage());
-            menuItem.setPrice(menuItem.getPrice());
-            menuItem.setDescription(menuItem.getDescription());
-            menuItem.setIsVegetarian(menuItem.getIsVegetarian());
+            menuItem.setName(request.getName());
+            menuItem.setImage(request.getImage());
+            menuItem.setSubcategories(subcategory);
+            menuItem.setPrice(request.getPrice());
+            menuItem.setDescription(request.getDescription());
+            menuItem.setIsVegetarian(request .getIsVegetarian());
             menuItemRepository.save(menuItem);
             return new MenuItemResponse(
                     menuItem.getId(),
@@ -94,16 +96,41 @@ public class MenuItemServicesImpl implements MenuItemServices {
     public String delete(Long id) {
         MenuItem menuItem = menuItemRepository.findById(id).orElseThrow(() ->
                 new NoSuchElementException(String.format("MenuItem with id :%s already exists", id)));
-        for (Subcategory subcategory : subcategoryRepository.findAll()) {
-            if(subcategory.getMenuItem().getId()== menuItem.getId()){
-                subcategory.setMenuItem(null);
-                menuItem.setSubcategories(null);
-            }
-        }
+        menuItem.setSubcategories(null);
         menuItemRepository.save(menuItem);
         menuItemRepository.deleteById(id);
-        return String.format("%s is deleted!",id);
+        return String.format("%s is deleted!", id);
     }
+    public List<MenuItemResponse> getAllResponse() {
+        List<MenuItemResponse> getAllMenuItemResponse = new ArrayList<>();
+        List<MenuItem> all = menuItemRepository.findAll();
+        for (MenuItem menuItem : all) {
+            if(menuItem.getIsBlocked()!=null) {
+                int result = menuItem.getIsBlocked().compareTo(LocalDate.now());
+                if (result != 0) {
+                    getAllMenuItemResponse.add(new MenuItemResponse(
+                            menuItem.getId(),
+                            menuItem.getName(),
+                            menuItem.getImage(),
+                            menuItem.getPrice(),
+                            menuItem.getDescription(),
+                            menuItem.getIsVegetarian()
+                    ));
+                }
+            }else {
+                getAllMenuItemResponse.add(new MenuItemResponse(
+                        menuItem.getId(),
+                        menuItem.getName(),
+                        menuItem.getImage(),
+                        menuItem.getPrice(),
+                        menuItem.getDescription(),
+                        menuItem.getIsVegetarian()
+                ));
+            }
+        }
+        return getAllMenuItemResponse;
+    }
+
 
     @Override
     public List<MenuItemResponse> getAllOrder(Boolean descOrAsc) {
@@ -111,32 +138,27 @@ public class MenuItemServicesImpl implements MenuItemServices {
             return null;
         }else {
             if(descOrAsc){
-                return menuItemRepository.getAllOrder().stream().sorted(Comparator.comparing(MenuItemResponse::getPrice)).toList();
+                return getAllResponse().stream().sorted(Comparator.comparing(MenuItemResponse::getPrice)).toList();
             }else {
-                return menuItemRepository.getAllOrder().stream().sorted(Comparator.comparing(MenuItemResponse::getPrice).reversed()).toList();
+                return getAllResponse().stream().sorted(Comparator.comparing(MenuItemResponse::getPrice).reversed()).toList();
             }
         }
     }
 
     @Override
     public List<MenuItemResponse> getAllContains(String name) {
-
-        if(name.isBlank()) {
-            return null;
-        }else {
-            return menuItemRepository.getAllOrder().stream().filter(menuItemResponse -> menuItemResponse.getName().contains(name)).toList();
-        }
+        return getAllResponse().stream().filter(menuItemResponse -> menuItemResponse.getName().contains(name)).toList();
     }
 
     @Override
     public List<MenuItemResponse> getAllVega(Boolean vegOrNot) {
-        if(vegOrNot!=null) {
-            if(vegOrNot){
-                return menuItemRepository.getAllOrder().stream().filter(menuItemResponse -> menuItemResponse.getIsVegetarian()).toList();
-            }else {
-                return menuItemRepository.getAllOrder().stream().filter(menuItemResponse -> !menuItemResponse.getIsVegetarian()).toList();
+        if (vegOrNot != null) {
+            if (vegOrNot) {
+                return getAllResponse().stream().filter(MenuItemResponse::getIsVegetarian).toList();
+            } else {
+                return getAllResponse().stream().filter(menuItemResponse -> !menuItemResponse.getIsVegetarian()).toList();
             }
-        }else {
+        } else {
             return null;
         }
     }

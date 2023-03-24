@@ -35,6 +35,7 @@ public class StopListServicesImpl implements StopListServices {
                 request.getReason(),
                 request.getDate()
         );
+        menuItem.setIsBlocked(stopList.getDate());
         stopList.setMenuItem(menuItem);
         stopListRepository.save(stopList);
         return new StopListResponse(

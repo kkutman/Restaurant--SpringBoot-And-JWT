@@ -25,8 +25,8 @@ public class Subcategory {
     private String name;
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     private Category category;
-    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
-    private MenuItem menuItem;
+    @OneToMany(cascade = {CascadeType.ALL,CascadeType.REMOVE},orphanRemoval = false)
+    private List<MenuItem> menuItems;
 
     public Subcategory(String name) {
         this.name = name;

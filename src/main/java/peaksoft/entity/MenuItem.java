@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +32,11 @@ public class MenuItem {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
-    private List<Subcategory>subcategories;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+    private Subcategory subcategories;
     @ManyToMany(mappedBy = "menuItems_id", cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     private List<Cheque> cheques = new ArrayList<>();
+
     public MenuItem(String name, String image, int price, String description, Boolean isVegetarian) {
         this.name = name;
         this.image = image;
@@ -42,4 +44,9 @@ public class MenuItem {
         this.description = description;
         this.isVegetarian = isVegetarian;
     }
+    private LocalDate isBlocked;
+
+    @OneToOne(mappedBy = "menuItem", orphanRemoval = true,cascade = CascadeType.ALL)
+    private StopList stopList;
+
 }

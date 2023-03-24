@@ -20,10 +20,10 @@ import java.util.Map;
 public class SubcategoryController {
     private final SubcategoryServices subcategoryServices;
 
-    @PostMapping("/save/{categoryId}/{menuId}")
+    @PostMapping("/save/{categoryId}")
     @PreAuthorize("hasAnyAuthority('ADMIN','CHEF')")
-    public SubcategoryResponse save(@PathVariable Long categoryId,@PathVariable Long menuId, @RequestBody SubcategoryRequest request) {
-        return subcategoryServices.saveSubcategory(categoryId,menuId,request);
+    public SubcategoryResponse save(@PathVariable Long categoryId, @RequestBody SubcategoryRequest request) {
+        return subcategoryServices.saveSubcategory(categoryId,request);
     }
 
     @GetMapping("/getAll/{id}")

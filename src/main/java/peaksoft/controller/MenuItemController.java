@@ -54,4 +54,10 @@ public class MenuItemController {
     public List<MenuItemResponse> getAllContains(@PathVariable String name) {
         return menuItemServices.getAllContains(name);
     }
+
+    @GetMapping("/update/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','CHEF')")
+    public MenuItemResponse update(@PathVariable Long id,@RequestBody MenuItemRequest request) {
+        return menuItemServices.update(id, request);
+    }
 }

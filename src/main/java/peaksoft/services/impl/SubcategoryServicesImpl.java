@@ -29,25 +29,23 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
     private final MenuItemRepository menuItemRepository;
 
     @Override
-    public SubcategoryResponse saveSubcategory(Long id,Long menuId, SubcategoryRequest request) {
+    public SubcategoryResponse saveSubcategory(Long id, SubcategoryRequest request) {
         if (id != null) {
-            if (menuId != null) {
-                if (!request.getName().isBlank()) {
-                    Category category = categoryRepository.findById(id).orElseThrow();
-                    MenuItem menuItem = menuItemRepository.findById(menuId).orElseThrow();
-                    Subcategory subcategory = new Subcategory(request.getName());
-                    subcategory.setMenuItem(menuItem);
-                    subcategory.setCategory(category);
-                    subcategoryRepository.save(subcategory);
-                    return new SubcategoryResponse(subcategory.getId(), subcategory.getName(), subcategory.getCategory().getName());
-                }
+            if (!request.getName().isBlank()) {
+                Category category = categoryRepository.findById(id).orElseThrow();
+                Subcategory subcategory = new Subcategory(request.getName());
+                subcategory.setCategory(category);
+                subcategoryRepository.save(subcategory);
+                return new SubcategoryResponse(subcategory.getId(), subcategory.getName(), subcategory.getCategory().getName());
             }
+            return null;
         }
 
         return null;
     }
 
-     @Override
+
+    @Override
     public SubcategoryResponse getById(Long id) {
         return subcategoryRepository.getByCategoryResponse(id).orElseThrow(() ->
                 new NoSuchElementException(String.format
@@ -60,6 +58,11 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
             Subcategory subcategory = subcategoryRepository.findById(id).orElseThrow(() ->
                     new NoSuchElementException(String.format
                             ("There is no SubCategory with this ID %s", id)));
+            for (MenuItem menuItem : menuItemRepository.findAll()) {
+                if(menuItem.getSubcategories().getId()==id){
+                    menuItemRepository.deleteById(menuItem.getId());
+                }
+            }
             subcategoryRepository.deleteById(id);
             return String.format("Subcategory %s is deleted", subcategory.getName());
         }
@@ -82,16 +85,16 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
                             ("There is no SubCategory with this ID %s", id)));
             subcategory.setName(request.getName());
             subcategoryRepository.save(subcategory);
-            return new SubcategoryResponse(subcategory.getId(), subcategory.getName(),subcategory.getName());
+            return new SubcategoryResponse(subcategory.getId(), subcategory.getName(), subcategory.getName());
         }
         return null;
     }
 
     @Override
-    public Map<String, List<SubcategoryResponse>>  getMap() {
+    public Map<String, List<SubcategoryResponse>> getMap() {
         Map<String, List<SubcategoryResponse>> subcategoryResponseMapCollector = subcategoryRepository.getAll().stream().collect(Collectors.groupingBy(SubcategoryResponse::getCategoryName));
 
 
-    return subcategoryResponseMapCollector;
+        return subcategoryResponseMapCollector;
     }
 }

@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "restaurants")
-public class Restaurant {
+public class  Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "restaurant_seq")
     @SequenceGenerator(name = "restaurant_seq")
