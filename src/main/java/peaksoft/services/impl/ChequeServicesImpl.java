@@ -14,6 +14,7 @@ import peaksoft.entity.MenuItem;
 import peaksoft.entity.Restaurant;
 import peaksoft.entity.User;
 import peaksoft.enums.Role;
+import peaksoft.exception.NotFoundException;
 import peaksoft.repository.ChequeRepository;
 import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.RestaurantRepository;
@@ -25,9 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-/**
- * name : kutman
- **/
 @Service
 @RequiredArgsConstructor
 public class ChequeServicesImpl implements ChequeServices {
@@ -49,7 +47,7 @@ public class ChequeServicesImpl implements ChequeServices {
 
         User user = userRepository.findById(request.getWaiterId())
                 .orElseThrow(() ->
-                        new NoSuchElementException(String.format("Author with email :%s already exists", request.getWaiterId())));
+                        new NotFoundException(String.format("Author with email :%s already exists", request.getWaiterId())));
         if (user.getRole().equals(Role.WAITER)) {
             Cheque cheque = new Cheque();
             List<MenuItemResponse> menuItemResponses = new ArrayList<>();
@@ -126,7 +124,7 @@ public class ChequeServicesImpl implements ChequeServices {
     public WaiterResponseOfDay totalPriceWalter(WaiterRequest request) {
         User user = userRepository.findById(request.getWaiterId())
                 .orElseThrow(() ->
-                        new NoSuchElementException(String.format("User with email :%s already exists", request.getWaiterId())));
+                        new NotFoundException(String.format("User with email :%s already exists", request.getWaiterId())));
         List<Cheque> chequeList = chequeRepository.findAll().stream().filter(cheque -> cheque.getUser().getId() == request.getWaiterId()).toList();
         List<Cheque> cheques = chequeList.stream().filter(cheque -> cheque.getCreatedAt().equals(request.getDay())).toList();
         List<ChequeResponse> cheques1 = cheques(cheques);
@@ -136,8 +134,8 @@ public class ChequeServicesImpl implements ChequeServices {
         waiterResponseOfDay.setId(user.getId());
         waiterResponseOfDay.setChequeResponses(cheques1);
         int number = 0;
-        for (ChequeResponse cheq : cheques1) {
-            number += cheq.getGrandTotal();
+        for (ChequeResponse c : cheques1) {
+            number += c.getGrandTotal();
         }
         waiterResponseOfDay.setAllDayChequePrice(number);
         return waiterResponseOfDay;
@@ -146,9 +144,9 @@ public class ChequeServicesImpl implements ChequeServices {
     @Override
     public ChequeResponse update(Long id, ChequeRequest request) {
         Cheque cheque = chequeRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format("Cheque with id :%s already exists", id)));
+                new NotFoundException(String.format("Cheque with id :%s already exists", id)));
         User user = userRepository.findById(request.getWaiterId()).orElseThrow(() ->
-                new NoSuchElementException(String.format("Cheque with id :%s already exists", id)));
+                new NotFoundException(String.format("Cheque with id :%s already exists", id)));
         List<MenuItemResponse> menuItemResponses = new ArrayList<>();
         List<MenuItem> menuItemList = new ArrayList<>();
         for (String s : request.getMenuName()) {
@@ -198,8 +196,8 @@ public class ChequeServicesImpl implements ChequeServices {
         restaurantResponseOfDay.setName(getRestaurant().getName());
         restaurantResponseOfDay.setId(getRestaurant().getId());
         int number = 0;
-        for (ChequeResponse cheq : cheques1) {
-            number += cheq.getGrandTotal();
+        for (ChequeResponse c : cheques1) {
+            number += c.getGrandTotal();
         }
         restaurantResponseOfDay.setAllDayChequePrice(number);
         return restaurantResponseOfDay;
@@ -235,6 +233,8 @@ public class ChequeServicesImpl implements ChequeServices {
 
     @Override
     public String delete(Long id) {
+        Cheque cheque = chequeRepository.findById(id).orElseThrow(() ->
+                new NotFoundException(String.format("Cheque with id :%s already exists", id)));
         chequeRepository.delete(id);
         return id + " is deleted!";
     }

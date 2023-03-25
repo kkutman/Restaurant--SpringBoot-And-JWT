@@ -8,6 +8,7 @@ import peaksoft.dto.response.SubcategoryResponse;
 import peaksoft.entity.Category;
 import peaksoft.entity.MenuItem;
 import peaksoft.entity.Subcategory;
+import peaksoft.exception.NotFoundException;
 import peaksoft.repository.CategoryRepository;
 import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.SubcategoryRepository;
@@ -48,7 +49,7 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
     @Override
     public SubcategoryResponse getById(Long id) {
         return subcategoryRepository.getByCategoryResponse(id).orElseThrow(() ->
-                new NoSuchElementException(String.format
+                new NotFoundException(String.format
                         ("There is no SubCategory with this ID %s", id)));
     }
 
@@ -56,10 +57,10 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
     public String delete(Long id) {
         if (id != null) {
             Subcategory subcategory = subcategoryRepository.findById(id).orElseThrow(() ->
-                    new NoSuchElementException(String.format
+                    new NotFoundException(String.format
                             ("There is no SubCategory with this ID %s", id)));
             for (MenuItem menuItem : menuItemRepository.findAll()) {
-                if(menuItem.getSubcategories().getId()==id){
+                if (menuItem.getSubcategories().getId() == id) {
                     menuItemRepository.deleteById(menuItem.getId());
                 }
             }
@@ -81,7 +82,7 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
     public SubcategoryResponse update(Long id, SubcategoryRequest request) {
         if (id != null) {
             Subcategory subcategory = subcategoryRepository.findById(id).orElseThrow(() ->
-                    new NoSuchElementException(String.format
+                    new NotFoundException(String.format
                             ("There is no SubCategory with this ID %s", id)));
             subcategory.setName(request.getName());
             subcategoryRepository.save(subcategory);
@@ -92,9 +93,9 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
 
     @Override
     public Map<String, List<SubcategoryResponse>> getMap() {
-        Map<String, List<SubcategoryResponse>> subcategoryResponseMapCollector = subcategoryRepository.getAll().stream().collect(Collectors.groupingBy(SubcategoryResponse::getCategoryName));
-
-
+        Map<String, List<SubcategoryResponse>> subcategoryResponseMapCollector =
+                subcategoryRepository.getAll().stream()
+                        .collect(Collectors.groupingBy(SubcategoryResponse::getCategoryName));
         return subcategoryResponseMapCollector;
     }
 }

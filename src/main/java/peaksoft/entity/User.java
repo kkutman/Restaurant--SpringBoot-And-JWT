@@ -28,6 +28,7 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
+
     private String email;
     private String password;
     private String phoneNumber;

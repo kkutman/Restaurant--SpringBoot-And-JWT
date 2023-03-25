@@ -6,6 +6,8 @@ import peaksoft.dto.request.CategoryRequest;
 import peaksoft.dto.response.CategoryResponse;
 import peaksoft.entity.Category;
 import peaksoft.entity.Subcategory;
+import peaksoft.exception.BadRequestException;
+import peaksoft.exception.NotFoundException;
 import peaksoft.exception.SaveCategoryException;
 import peaksoft.repository.CategoryRepository;
 import peaksoft.services.CategoryServices;
@@ -26,17 +28,12 @@ public class CategoryServicesImpl implements CategoryServices {
     @Override
     public CategoryResponse saveCategory(CategoryRequest request) {
         if (request.getName().isBlank()) {
-            try {
-                throw new SaveCategoryException("When saving the restaurant, one of the columns remained empty");
-            } catch (SaveCategoryException e) {
-                System.out.println(e.getMessage());
-            }
+                throw new BadRequestException("When saving the restaurant, one of the columns remained empty");
         } else {
             Category category = new Category(request.getName());
             categoryRepository.save(category);
             return new CategoryResponse(category.getId(), category.getName());
         }
-        return null;
     }
 
     @Override
@@ -47,14 +44,14 @@ public class CategoryServicesImpl implements CategoryServices {
     @Override
     public CategoryResponse getById(Long id) {
         return categoryRepository.getByIdCategory(id).orElseThrow(() ->
-                new NoSuchElementException(String.format
+                new NotFoundException(String.format
                         ("There is no Category with this ID %s", id)));
     }
 
     @Override
     public String deleteById(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format
+                new NotFoundException(String.format
                         ("There is no Category with this ID %s", id)));
         for (Subcategory subcategory : category.getSubcategories()) {
             subcategoryServices.delete(subcategory.getId());
@@ -69,7 +66,7 @@ public class CategoryServicesImpl implements CategoryServices {
             if (!request.getName().isBlank()) {
                 assert id != null;
                 Category category = categoryRepository.findById(id).orElseThrow(() ->
-                        new NoSuchElementException(String.format
+                        new NotFoundException(String.format
                                 ("There is no Category with this ID %s", id)));
                 category.setName(request.getName());
                 categoryRepository.save(category);
@@ -85,7 +82,7 @@ public class CategoryServicesImpl implements CategoryServices {
     @Override
     public Category get(Long id) {
         return categoryRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format
+                new NotFoundException(String.format
                         ("There is no Category with this ID %s", id)));
     }
 

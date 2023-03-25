@@ -7,6 +7,7 @@ import lombok.Setter;
 import peaksoft.enums.Role;
 
 import java.time.LocalDate;
+import java.time.Year;
 
 /**
  * name : kutman
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 public class UserResponse {
     private Long id;
     private String fullName;
-    private LocalDate dateOfBirth;
+    private int dateOfBirth;
     private String email;
     private String phoneNumber;
     private Role role;

@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import peaksoft.dto.request.RestaurantRequest;
 import peaksoft.dto.response.RestaurantResponse;
+import peaksoft.entity.MenuItem;
 import peaksoft.entity.Restaurant;
 import peaksoft.entity.User;
+import peaksoft.exception.BadRequestException;
+import peaksoft.exception.NotFoundException;
 import peaksoft.exception.SaveRestaurantException;
+import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.RestaurantRepository;
 import peaksoft.repository.UserRepository;
+import peaksoft.services.MenuItemServices;
 import peaksoft.services.RestaurantServices;
 
 import java.util.List;
@@ -18,17 +23,18 @@ import java.util.NoSuchElementException;
 public class RestaurantServicesImpl implements RestaurantServices {
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userServices;
+    private final MenuItemRepository menuItemRepository;
+    private final MenuItemServices menuItemServices;
 
     @Override
-    public RestaurantResponse saveRestaurant(RestaurantRequest restaurantRequest) {
+    public RestaurantResponse saveRestaurant(RestaurantRequest restaurantRequest) throws NotFoundException{
         int countRestaurant = getAllRestaurant().size();
         if (countRestaurant < 1) {
-            try {
                 if (restaurantRequest.getName().isBlank() ||
                         restaurantRequest.getRestaurantType().describeConstable().isEmpty() ||
                         restaurantRequest.getServices() == 0 ||
                         restaurantRequest.getLocation().isBlank()) {
-                    throw new SaveRestaurantException("When saving the restaurant, one of the columns remained empty");
+                    throw new BadRequestException("When saving the restaurant, one of the columns remained empty");
                 } else {
                     Restaurant restaurant = new Restaurant(
                             restaurantRequest.getName(),
@@ -47,20 +53,16 @@ public class RestaurantServicesImpl implements RestaurantServices {
                             restaurant.getServices()
                     );
                 }
-            } catch (SaveRestaurantException e) {
-                System.out.println(e.getMessage());
-            }
         } else {
-            return null;
+            throw new BadRequestException("You cannot save more than one restaurant!");
         }
-        return null;
     }
 
     @Override
     public RestaurantResponse getRestaurantById(Long restaurantId) {
         try {
             return restaurantRepository.findByIdRestaurant(restaurantId).orElseThrow(() ->
-                    new NoSuchElementException(String.format
+                    new NotFoundException(String.format
                             ("There is no restaurant with this ID %s", restaurantId)));
         } catch (NoSuchElementException e) {
             System.err.println(e.getMessage());
@@ -72,8 +74,11 @@ public class RestaurantServicesImpl implements RestaurantServices {
     public String deleteRestaurantById(Long id) {
         try {
             restaurantRepository.findByIdRestaurant(id).orElseThrow(() ->
-                    new NoSuchElementException(String.format
+                    new NotFoundException(String.format
                             ("There is no restaurant with this ID %s", id)));
+            for (MenuItem menuItem : menuItemRepository.findAll()) {
+                menuItemServices.delete(menuItem.getId());
+            }
             restaurantRepository.deleteById(id);
             return String.format("The restaurant with this ID : %s has been deleted!", id);
         } catch (NoSuchElementException e) {
@@ -90,7 +95,7 @@ public class RestaurantServicesImpl implements RestaurantServices {
     @Override
     public RestaurantResponse updateRestaurant(Long id, RestaurantRequest restaurantRequest) {
         Restaurant restaurant = restaurantRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format
+                new NotFoundException(String.format
                         ("There is no restaurant with this ID %s", id)));
         restaurant.setName(restaurantRequest.getName());
         restaurant.setLocation(restaurantRequest.getLocation());
@@ -114,7 +119,7 @@ public class RestaurantServicesImpl implements RestaurantServices {
             restaurant1 = restaurant;
         }
         User user = userServices.findById(userId).orElseThrow(() ->
-                new NoSuchElementException(String.format("User with id :%s already exists", userId)));
+                new NotFoundException(String.format("User with id :%s already exists", userId)));
         if (restaurant1 != null) {
             if (takeOrNot) {
                 if(restaurant1.getNumberOfEmployees()<15) {

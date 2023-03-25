@@ -13,6 +13,8 @@ import peaksoft.dto.response.AuthenticationResponse;
 import peaksoft.dto.response.UserResponse;
 import peaksoft.entity.User;
 import peaksoft.enums.Role;
+import peaksoft.exception.BadRequestException;
+import peaksoft.exception.NotFoundException;
 import peaksoft.exception.SaveUserException;
 import peaksoft.repository.UserRepository;
 import peaksoft.services.UserServices;
@@ -44,21 +46,25 @@ public class UserServicesImpl implements UserServices {
         }
         if (userRequest.getRole().equals(Role.CHEF)) {
             if (userRequest.getExperience() < 2) {
-                try {
-                    throw new SaveUserException("The chef must have experience pain 2");
-                } catch (SaveUserException e) {
-                    throw new RuntimeException(e);
-                }
+                throw new BadRequestException("The chef must have experience pain 2");
+            }
+            if (LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() < 45 &&
+                    LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() > 24) {
+                throw new BadRequestException("The chef age > 24 > 45");
             }
         }
-
         if (userRequest.getRole().equals(Role.WAITER)) {
             if (userRequest.getExperience() < 1) {
-                try {
-                    throw new SaveUserException("The waiter must have experience pain 1");
-                } catch (SaveUserException e) {
-                    throw new RuntimeException(e);
-                }
+                throw new BadRequestException("The waiter must have experience pain 1");
+            }
+            if (LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() < 31 ||
+                    LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() < 17) {
+                throw new BadRequestException("The waiter age > 18 > 30");
+            }
+        }
+        if (!userRequest.getPhoneNumber().startsWith("+996")) {
+            if (userRequest.getPhoneNumber().length() != 13) {
+                throw new BadRequestException("Phone number exception");
             }
         }
         User user = new User(
@@ -77,12 +83,13 @@ public class UserServicesImpl implements UserServices {
         return new UserResponse(
                 user.getId(),
                 user.getFirstName().concat(userRequest.getLastName()),
-                user.getDateOfBirth(),
+                LocalDate.now().minusYears(user.getDateOfBirth().getYear()).getYear(),
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getRole()
         );
     }
+
 
     @Override
     public AuthenticationResponse login(AuthenticateRequest request) {
@@ -101,11 +108,11 @@ public class UserServicesImpl implements UserServices {
     @Override
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format("Author with email :%s already exists", id)));
+                new NotFoundException(String.format("Author with email :%s already exists", id)));
         return new UserResponse(
                 user.getId(),
                 user.getFirstName().concat(user.getLastName()),
-                user.getDateOfBirth(),
+                LocalDate.now().minusYears(user.getDateOfBirth().getYear()).getYear(),
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getRole()
@@ -120,7 +127,7 @@ public class UserServicesImpl implements UserServices {
     @Override
     public String deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format("Author with email :%s already exists", id)));
+                new NotFoundException(String.format("Author with email :%s already exists", id)));
         userRepository.deleteById(id);
         return user.getEmail() + " is deleted!";
     }
@@ -128,7 +135,7 @@ public class UserServicesImpl implements UserServices {
     @Override
     public UserResponse updateUser(Long id, UserRequest userRequest) {
         User user = userRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format("Author with email :%s already exists", id)));
+                new NotFoundException(String.format("Author with email :%s already exists", id)));
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setDateOfBirth(userRequest.getDateOfBirth());
@@ -141,7 +148,7 @@ public class UserServicesImpl implements UserServices {
         return new UserResponse(
                 user.getId(),
                 user.getFirstName().concat(user.getLastName()),
-                user.getDateOfBirth(),
+                LocalDate.now().minusYears(user.getDateOfBirth().getYear()).getYear(),
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getRole()

@@ -6,13 +6,14 @@ import peaksoft.dto.request.StopListRequest;
 import peaksoft.dto.response.StopListResponse;
 import peaksoft.entity.MenuItem;
 import peaksoft.entity.StopList;
+import peaksoft.exception.BadRequestException;
+import peaksoft.exception.NotFoundException;
 import peaksoft.exception.SaveStopListException;
 import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.StopListRepository;
 import peaksoft.services.StopListServices;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class StopListServicesImpl implements StopListServices {
@@ -22,12 +23,12 @@ public class StopListServicesImpl implements StopListServices {
     @Override
     public StopListResponse save(Long menuId, StopListRequest request) throws SaveStopListException {
         MenuItem menuItem = menuItemRepository.findById(menuId).orElseThrow(() ->
-                new NoSuchElementException(String.format("Menu Item with id :%s already exists!", menuId)));
+                new NotFoundException(String.format("Menu Item with id :%s already exists!", menuId)));
         for (StopList stopList : stopListRepository.findAll()) {
             int date = stopList.getDate().compareTo(request.getDate());
             if (date==0) {
                 if(stopList.getMenuItem().getId()==menuItem.getId()) {
-                        throw new SaveStopListException("Save Date Exception!");
+                        throw new BadRequestException("Save Date Exception!");
                 }
             }
         }
@@ -49,7 +50,7 @@ public class StopListServicesImpl implements StopListServices {
     @Override
     public String delete(Long id) {
         StopList stopList = stopListRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format("StopList with id :%s already exists", id)));
+                new NotFoundException(String.format("StopList with id :%s already exists", id)));
         stopListRepository.deleteStopList(id);
         return id+ " is deleted!!!";
     }
@@ -58,7 +59,7 @@ public class StopListServicesImpl implements StopListServices {
     public StopListResponse getById(Long id) {
         if (id != null) {
             StopList stopList = stopListRepository.findById(id).orElseThrow(() ->
-                    new NoSuchElementException(String.format("StopList with id :%s already exists", id)));
+                    new NotFoundException(String.format("StopList with id :%s already exists", id)));
             return new StopListResponse(
                     stopList.getId(),
                     stopList.getReason(),
@@ -78,7 +79,7 @@ public class StopListServicesImpl implements StopListServices {
     public StopListResponse update(Long id, StopListRequest request) {
         if (id != null) {
             StopList stopList = stopListRepository.findById(id).orElseThrow(() ->
-                    new NoSuchElementException(String.format("StopList with id :%s already exists", id)));
+                    new NotFoundException(String.format("StopList with id :%s already exists", id)));
             stopList.setReason(request.getReason());
             stopList.setDate(request.getDate());
             stopListRepository.save(stopList);

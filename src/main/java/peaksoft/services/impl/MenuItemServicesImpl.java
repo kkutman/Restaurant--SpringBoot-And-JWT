@@ -39,7 +39,7 @@ public class MenuItemServicesImpl implements MenuItemServices {
             for (Restaurant restaurant : restaurantRepository.findAll()) {
                 restaurant1 = restaurant;
             }
-            Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId()).orElseThrow(() -> new NoSuchElementException("N Subcategory By Id " + request.getSubcategoryId()));
+            Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId()).orElseThrow(() -> new NotFoundException("N Subcategory By Id " + request.getSubcategoryId()));
             MenuItem menuItem = new MenuItem(
                     request.getName(),
                     request.getImage(),
@@ -67,8 +67,8 @@ public class MenuItemServicesImpl implements MenuItemServices {
         if (ifNot(request)) {
             return null;
         } else {
-            Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId()).orElseThrow(() -> new NoSuchElementException("N Subcategory By Id " + request.getSubcategoryId()));
-            MenuItem menuItem = menuItemRepository.findById(id).orElseThrow();
+            Subcategory subcategory = subcategoryRepository.findById(request.getSubcategoryId()).orElseThrow(() -> new NotFoundException("N Subcategory By Id " + request.getSubcategoryId()));
+            MenuItem menuItem = menuItemRepository.findById(id).orElseThrow(() -> new NotFoundException("MenuItem By Id " + request.getSubcategoryId()));
             menuItem.setName(request.getName());
             menuItem.setImage(request.getImage());
             menuItem.setSubcategories(subcategory);
@@ -96,7 +96,7 @@ public class MenuItemServicesImpl implements MenuItemServices {
     @Override
     public String delete(Long id) {
         MenuItem menuItem = menuItemRepository.findById(id).orElseThrow(() ->
-                new NoSuchElementException(String.format("MenuItem with id :%s already exists", id)));
+                new NotFoundException(String.format("MenuItem with id :%s already exists", id)));
         menuItem.setSubcategories(null);
         menuItemRepository.save(menuItem);
         menuItemRepository.deleteById(id);
