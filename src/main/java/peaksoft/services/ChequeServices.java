@@ -1,7 +1,11 @@
 package peaksoft.services;
 
 import peaksoft.dto.request.ChequeRequest;
+import peaksoft.dto.request.RestaurantRequestOfDay;
+import peaksoft.dto.request.WaiterRequest;
 import peaksoft.dto.response.ChequeResponse;
+import peaksoft.dto.response.RestaurantResponseOfDay;
+import peaksoft.dto.response.WaiterResponseOfDay;
 
 import java.util.List;
 
@@ -10,11 +14,10 @@ import java.util.List;
  **/
 public interface ChequeServices {
     ChequeResponse save(ChequeRequest request);
-    int totalPriceWalter(Long id);
+    WaiterResponseOfDay totalPriceWalter(WaiterRequest request);
     ChequeResponse update(Long id,ChequeRequest request);
     List<ChequeResponse>getAll();
-    int totalPriceRestaurant();
-
+    RestaurantResponseOfDay totalPriceRestaurant(RestaurantRequestOfDay request);
     String delete(Long id);
     ChequeResponse getById(Long id);
 }

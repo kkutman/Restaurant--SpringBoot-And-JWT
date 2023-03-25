@@ -7,6 +7,7 @@ import peaksoft.dto.response.MenuItemResponse;
 import peaksoft.entity.MenuItem;
 import peaksoft.entity.Restaurant;
 import peaksoft.entity.Subcategory;
+import peaksoft.exception.NotFoundException;
 import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.RestaurantRepository;
 import peaksoft.repository.SubcategoryRepository;
@@ -89,7 +90,7 @@ public class MenuItemServicesImpl implements MenuItemServices {
     @Override
     public MenuItemResponse getById(Long id) {
         return menuItemRepository.getByMenu(id).orElseThrow(() ->
-                new NoSuchElementException(String.format("MenuItem with id :%s already exists", id)));
+                new NotFoundException(String.format("MenuItem with id :%s already exists", id)));
     }
 
     @Override

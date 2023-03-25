@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -19,5 +20,6 @@ public class ChequeResponse {
     private int avaPrice;
     private int services;
     private int grandTotal;
+    private LocalDate date;
 
 }
