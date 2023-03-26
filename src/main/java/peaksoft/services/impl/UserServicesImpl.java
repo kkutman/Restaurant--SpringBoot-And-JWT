@@ -48,17 +48,21 @@ public class UserServicesImpl implements UserServices {
             if (userRequest.getExperience() < 2) {
                 throw new BadRequestException("The chef must have experience pain 2");
             }
-            if (LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() < 45 &&
-                    LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() > 24) {
-                throw new BadRequestException("The chef age > 24 > 45");
+            int now = LocalDate.now().getYear();
+            int dateOfBirth = userRequest.getDateOfBirth().getYear();
+            int num = now - dateOfBirth;
+            if (num > 46 || num < 24) {
+                throw new BadRequestException("The chef age > 25 > 45 ");
             }
         }
         if (userRequest.getRole().equals(Role.WAITER)) {
             if (userRequest.getExperience() < 1) {
                 throw new BadRequestException("The waiter must have experience pain 1");
             }
-            if (LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() < 31 ||
-                    LocalDate.now().minusYears(userRequest.getDateOfBirth().getYear()).getYear() < 17) {
+            int now = LocalDate.now().getYear();
+            int dateOfBirth = userRequest.getDateOfBirth().getYear();
+            int num = now - dateOfBirth;
+            if (num > 31 || num < 17) {
                 throw new BadRequestException("The waiter age > 18 > 30");
             }
         }
