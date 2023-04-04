@@ -27,12 +27,17 @@ public class CategoryServicesImpl implements CategoryServices {
 
     @Override
     public CategoryResponse saveCategory(CategoryRequest request) {
-        if (request.getName().isBlank()) {
+        List<Category>categoryList = categoryRepository.findAll().stream().filter(category -> category.getName().equalsIgnoreCase(request.getName())).toList();
+        if(categoryList.size()==0) {
+            if (request.getName().isBlank()) {
                 throw new BadRequestException("When saving the restaurant, one of the columns remained empty");
-        } else {
-            Category category = new Category(request.getName());
-            categoryRepository.save(category);
-            return new CategoryResponse(category.getId(), category.getName());
+            } else {
+                Category category = new Category(request.getName());
+                categoryRepository.save(category);
+                return new CategoryResponse(category.getId(), category.getName());
+            }
+        }else {
+            throw new BadRequestException("name in");
         }
     }
 

@@ -33,7 +33,7 @@ public class CategoryController {
 
     @GetMapping("/get/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN','CHEF','WAITER')")
-    public CategoryResponse getBiId(@PathVariable Long id){
+    public CategoryResponse getById(@PathVariable Long id){
         return categoryServices.getById(id);
     }
 

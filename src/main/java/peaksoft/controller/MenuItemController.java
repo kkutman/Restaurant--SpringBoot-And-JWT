@@ -60,4 +60,9 @@ public class MenuItemController {
     public MenuItemResponse update(@PathVariable Long id,@RequestBody MenuItemRequest request) {
         return menuItemServices.update(id, request);
     }
+
+    @GetMapping("/getAll")
+    public List<MenuItemResponse>getAll(){
+        return menuItemServices.getAllResponse();
+    }
 }

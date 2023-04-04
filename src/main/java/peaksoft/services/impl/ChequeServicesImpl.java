@@ -14,6 +14,7 @@ import peaksoft.entity.MenuItem;
 import peaksoft.entity.Restaurant;
 import peaksoft.entity.User;
 import peaksoft.enums.Role;
+import peaksoft.exception.BadRequestException;
 import peaksoft.exception.NotFoundException;
 import peaksoft.repository.ChequeRepository;
 import peaksoft.repository.MenuItemRepository;
@@ -24,7 +25,6 @@ import peaksoft.services.ChequeServices;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -64,9 +64,12 @@ public class ChequeServicesImpl implements ChequeServices {
             int num = 0;
             int count = 0;
             for (MenuItemResponse menuItem : menuItemResponses) {
+                System.out.println(menuItem.getPrice()+"bnm,.");
                 num = num + menuItem.getPrice();
                 count++;
+                System.out.println(count);
             }
+
             int totalPrice = num + ((num / 100) * getRestaurant().getServices());
             cheque.setPriceAverage(num / count);
             cheque.setTotal(num);
@@ -82,7 +85,7 @@ public class ChequeServicesImpl implements ChequeServices {
                     cheque.getCreatedAt()
             );
         }
-        return null;
+        throw  new BadRequestException("user id "+request.getWaiterId()+ " no waiter");
     }
 
     public List<ChequeResponse> cheques  (List<Cheque> cheques){

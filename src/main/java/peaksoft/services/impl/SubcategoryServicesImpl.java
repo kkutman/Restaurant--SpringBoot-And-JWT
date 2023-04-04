@@ -8,6 +8,7 @@ import peaksoft.dto.response.SubcategoryResponse;
 import peaksoft.entity.Category;
 import peaksoft.entity.MenuItem;
 import peaksoft.entity.Subcategory;
+import peaksoft.exception.BadRequestException;
 import peaksoft.exception.NotFoundException;
 import peaksoft.repository.CategoryRepository;
 import peaksoft.repository.MenuItemRepository;
@@ -31,18 +32,23 @@ public class SubcategoryServicesImpl implements SubcategoryServices {
 
     @Override
     public SubcategoryResponse saveSubcategory(Long id, SubcategoryRequest request) {
-        if (id != null) {
-            if (!request.getName().isBlank()) {
-                Category category = categoryRepository.findById(id).orElseThrow();
-                Subcategory subcategory = new Subcategory(request.getName());
-                subcategory.setCategory(category);
-                subcategoryRepository.save(subcategory);
-                return new SubcategoryResponse(subcategory.getId(), subcategory.getName(), subcategory.getCategory().getName());
+        List<Subcategory>categoryList = subcategoryRepository.findAll().stream().filter(category -> category.getName().equalsIgnoreCase(request.getName())).toList();
+        if(categoryList.size()==0) {
+            if (id != null) {
+                if (!request.getName().isBlank()) {
+                    Category category = categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("Category by id " + id + " no"));
+                    Subcategory subcategory = new Subcategory(request.getName());
+                    subcategory.setCategory(category);
+                    subcategoryRepository.save(subcategory);
+                    return new SubcategoryResponse(subcategory.getId(), subcategory.getName(), subcategory.getCategory().getName());
+                }
+                return null;
+            } else {
+                throw new BadRequestException("id == null");
             }
-            return null;
+        }else {
+            throw new BadRequestException("name exception");
         }
-
-        return null;
     }
 
 

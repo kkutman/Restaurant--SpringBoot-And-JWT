@@ -1,6 +1,7 @@
 package peaksoft.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
-
+    @Email
     private String email;
     private String password;
     private String phoneNumber;
@@ -36,7 +37,7 @@ public class User implements UserDetails {
     private Role role;
     private int experience;
 
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     private Restaurant restaurant;
 
     public User(String firstName, String lastName, LocalDate dateOfBirth, String email, String password, String phoneNumber, Role role, int experience) {

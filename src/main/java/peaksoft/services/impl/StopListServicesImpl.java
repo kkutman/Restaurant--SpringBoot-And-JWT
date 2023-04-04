@@ -13,6 +13,7 @@ import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.StopListRepository;
 import peaksoft.services.StopListServices;
 
+import java.time.LocalDate;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
@@ -22,35 +23,43 @@ public class StopListServicesImpl implements StopListServices {
 
     @Override
     public StopListResponse save(Long menuId, StopListRequest request) throws SaveStopListException {
-        MenuItem menuItem = menuItemRepository.findById(menuId).orElseThrow(() ->
-                new NotFoundException(String.format("Menu Item with id :%s already exists!", menuId)));
-        for (StopList stopList : stopListRepository.findAll()) {
-            int date = stopList.getDate().compareTo(request.getDate());
-            if (date==0) {
-                if(stopList.getMenuItem().getId()==menuItem.getId()) {
+        int date1 = request.getDate().compareTo(LocalDate.now());
+        if (date1>=0) {
+            MenuItem menuItem = menuItemRepository.findById(menuId).orElseThrow(() ->
+                    new NotFoundException(String.format("Menu Item with id :%s already exists!", menuId)));
+            for (StopList stopList : stopListRepository.findAll()) {
+                int date = stopList.getDate().compareTo(request.getDate());
+                if (date == 0) {
+                    if (stopList.getMenuItem().getId() == menuItem.getId()) {
                         throw new BadRequestException("Save Date Exception!");
+                    }
                 }
             }
+            StopList stopList = new StopList(
+                    request.getReason(),
+                    request.getDate()
+            );
+            menuItem.setIsBlocked(stopList.getDate());
+            stopList.setMenuItem(menuItem);
+            stopListRepository.save(stopList);
+            return new StopListResponse(
+                    stopList.getId(),
+                    stopList.getReason(),
+                    stopList.getDate(),
+                    stopList.getMenuItem().getName()
+            );
+        }else {
+            throw new BadRequestException("date exception!");
         }
-        StopList stopList = new StopList(
-                request.getReason(),
-                request.getDate()
-        );
-        menuItem.setIsBlocked(stopList.getDate());
-        stopList.setMenuItem(menuItem);
-        stopListRepository.save(stopList);
-        return new StopListResponse(
-                stopList.getId(),
-                stopList.getReason(),
-                stopList.getDate(),
-                stopList.getMenuItem().getName()
-        );
     }
 
     @Override
     public String delete(Long id) {
         StopList stopList = stopListRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("StopList with id :%s already exists", id)));
+        MenuItem menuItem = menuItemRepository.findById(stopList.getMenuItem().getId()).orElseThrow(() -> new NotFoundException("mo"));
+        menuItem.setIsBlocked(null);
+        menuItemRepository.save(menuItem);
         stopListRepository.deleteStopList(id);
         return id+ " is deleted!!!";
     }

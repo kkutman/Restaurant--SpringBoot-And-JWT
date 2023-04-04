@@ -27,7 +27,7 @@ public class  Restaurant {
     private int numberOfEmployees;
     private int services;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.PERSIST)
     private List<User> users = new ArrayList<>();
 
     public Restaurant(String name, String location, RestaurantType restaurantType, int numberOfEmployees, int services) {

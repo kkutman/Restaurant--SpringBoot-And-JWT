@@ -1,5 +1,6 @@
 package peaksoft.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public UserResponse save(@RequestBody UserRequest userRequest) {
+    public UserResponse save(@Valid @RequestBody UserRequest userRequest) {
         return userServices.saveUser(userRequest);
     }
 

@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import peaksoft.dto.request.MenuItemRequest;
 import peaksoft.dto.response.MenuItemResponse;
+import peaksoft.entity.Cheque;
 import peaksoft.entity.MenuItem;
 import peaksoft.entity.Restaurant;
 import peaksoft.entity.Subcategory;
 import peaksoft.exception.NotFoundException;
+import peaksoft.repository.ChequeRepository;
 import peaksoft.repository.MenuItemRepository;
 import peaksoft.repository.RestaurantRepository;
 import peaksoft.repository.SubcategoryRepository;
@@ -25,6 +27,7 @@ public class MenuItemServicesImpl implements MenuItemServices {
     private final MenuItemRepository menuItemRepository;
     private final SubcategoryRepository subcategoryRepository;
     private final RestaurantRepository restaurantRepository;
+    private final ChequeRepository chequeRepository;
 
     private Boolean ifNot(MenuItemRequest request) {
         return request.getName().isBlank() && request.getImage().isBlank() && request.getPrice() == 0 && request.getDescription().isBlank();
@@ -98,10 +101,14 @@ public class MenuItemServicesImpl implements MenuItemServices {
         MenuItem menuItem = menuItemRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("MenuItem with id :%s already exists", id)));
         menuItem.setSubcategories(null);
+        for (Cheque cheque : menuItem.getCheques()) {
+            chequeRepository.delete(cheque.getId());
+        }
         menuItemRepository.save(menuItem);
         menuItemRepository.deleteById(id);
         return String.format("%s is deleted!", id);
     }
+    @Override
     public List<MenuItemResponse> getAllResponse() {
         List<MenuItemResponse> getAllMenuItemResponse = new ArrayList<>();
         List<MenuItem> all = menuItemRepository.findAll();
@@ -116,7 +123,12 @@ public class MenuItemServicesImpl implements MenuItemServices {
                             menuItem.getPrice(),
                             menuItem.getDescription(),
                             menuItem.getIsVegetarian()
+
+
+
                     ));
+                }else {
+                    System.out.println("Not");
                 }
             }else {
                 getAllMenuItemResponse.add(new MenuItemResponse(
